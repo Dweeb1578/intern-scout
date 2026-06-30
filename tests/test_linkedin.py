@@ -11,3 +11,5 @@ def test_parse_results_keeps_interns():
     assert jobs[0].company == "Acme AI"
     assert jobs[0].location == "Bengaluru, India"
     assert jobs[0].source == "linkedin"
+    # tracking query params are stripped so the same job dedupes across queries
+    assert jobs[0].url == "https://www.linkedin.com/jobs/view/1"

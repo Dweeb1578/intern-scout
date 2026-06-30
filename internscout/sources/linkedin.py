@@ -20,6 +20,7 @@ class LinkedInSource:
                        or card.css("h4.base-search-card__subtitle::text").get() or "").strip()
             loc = (card.css("span.job-search-card__location::text").get() or "").strip()
             url = card.css("a.base-card__full-link::attr(href)").get() or ""
+            url = url.split("?")[0]  # drop per-request tracking params so dedupe works
             out.append(Job(title=title, company=company, location=loc,
                            remote=detect_remote(loc), url=url,
                            description=title, source=self.name))
