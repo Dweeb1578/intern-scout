@@ -7,11 +7,39 @@ _STOP = {"a","an","at","the","for","in","of","to","and","or","with","intern",
          "internship","want","looking","role","position","i","my","me","as"}
 
 _SYNONYMS = {
+    # tech
     "backend": ["api", "server", "django", "fastapi", "node"],
     "frontend": ["react", "ui", "javascript", "typescript"],
     "ml": ["machine learning", "pytorch", "model", "ai"],
     "data": ["analytics", "sql", "pipeline"],
     "design": ["figma", "ux", "ui"],
+    # operations
+    "operations": ["ops", "operations", "process", "fulfillment", "city operations",
+                   "business operations", "operations analyst", "logistics"],
+    "ops": ["operations", "process", "fulfillment", "business operations"],
+    # go-to-market (GTM)
+    "gtm": ["go-to-market", "sales", "marketing", "growth", "business development",
+            "revenue", "partnerships", "demand generation", "revops"],
+    "sales": ["business development", "bd", "inside sales", "account executive",
+              "sdr", "revenue", "go-to-market"],
+    "marketing": ["growth", "brand", "demand generation", "content", "performance marketing"],
+    "growth": ["marketing", "demand generation", "user acquisition", "gtm"],
+    # supply chain
+    "supply": ["supply chain", "procurement", "sourcing", "inventory", "logistics",
+               "warehouse", "demand planning", "vendor", "fulfillment"],
+    "chain": ["supply chain", "procurement", "logistics", "inventory"],
+    "procurement": ["sourcing", "vendor", "supply chain", "purchasing"],
+    "logistics": ["supply chain", "fulfillment", "warehouse", "last mile", "operations"],
+    # management / strategy
+    "management": ["management trainee", "program management", "project management",
+                   "chief of staff", "founder's office", "business analyst"],
+    "strategy": ["strategy and operations", "chief of staff", "founder's office",
+                 "business analyst", "consulting", "program management"],
+    "consulting": ["strategy", "business analyst", "advisory"],
+    "business": ["business analyst", "business development", "business operations",
+                 "strategy", "operations"],
+    "finance": ["fp&a", "financial analyst", "accounting", "treasury"],
+    "product": ["product management", "associate product manager", "apm"],
 }
 
 @dataclass

@@ -7,6 +7,18 @@ def test_fallback_extracts_keywords():
     assert any("intern" in q for q in fo.search_queries)
     assert isinstance(fo, FanOut)
 
+def test_fallback_expands_business_domains():
+    # operations / GTM / supply-chain / management prompts must fan out into
+    # domain vocabulary so keyword mode (no API key) catches relevant JDs
+    ops = _fallback_fanout("operations internship")
+    assert "fulfillment" in ops.keywords or "process" in ops.keywords
+    gtm = _fallback_fanout("gtm internship")
+    assert "sales" in gtm.keywords or "go-to-market" in gtm.keywords
+    sc = _fallback_fanout("supply chain internship")
+    assert "procurement" in sc.keywords or "logistics" in sc.keywords
+    mgmt = _fallback_fanout("management trainee role")
+    assert "business analyst" in mgmt.keywords or "chief of staff" in mgmt.keywords
+
 def test_fan_out_uses_fallback_without_key(monkeypatch):
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
     cfg = load_config()

@@ -19,6 +19,7 @@
   {"name": "SigNoz", "ats": "ashby", "slug": "signoz"},
   {"name": "Atlan", "ats": "ashby", "slug": "atlan"},
   {"name": "Nirvana", "ats": "ashby", "slug": "nirvana"},
+  {"name": "Navi", "ats": "ashby", "slug": "navi"},
   {"name": "Airtable", "ats": "greenhouse", "slug": "airtable"},
   {"name": "Brex", "ats": "greenhouse", "slug": "brex"},
   {"name": "Vercel", "ats": "greenhouse", "slug": "vercel"},

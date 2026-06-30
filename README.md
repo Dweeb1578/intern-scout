@@ -44,9 +44,22 @@ plus any remote role. Remote roles always pass regardless of where the company i
 
 To search elsewhere, pass explicit cities/countries, e.g. `--locations "London, Berlin"`.
 
+## Roles it understands
+
+Works for engineering internships **and** business/early-career roles — operations,
+GTM (sales / marketing / growth / business development), supply chain (procurement,
+logistics, fulfillment), and management/strategy (founder's office, chief of staff,
+business analyst, management trainee). India often labels these "Management Trainee" or
+"Graduate Programme" rather than "Intern" — those are recognized too. Just describe the
+role in your prompt; with a Groq key the matching is sharper, but keyword mode handles
+these domains out of the box.
+
 ## Notes
 
 - LinkedIn/Indeed are best-effort and may return little or nothing when they block bots;
   ATS boards and YC are the reliable core.
+- ATS coverage is Greenhouse / Lever / Ashby. Many large Indian consumer/logistics firms
+  (Swiggy, Flipkart, Delhivery…) use other systems (Darwinbox, Workday) and aren't
+  reachable yet — see the seed list for the companies that are.
 - Each person runs their own scrapes locally, so there's no shared server to rate-limit.
 - Add more companies in `internscout/data/seed_companies.json`.

@@ -7,6 +7,14 @@ def test_is_intern_role():
     assert is_intern_role("Backend Co-op")
     assert not is_intern_role("Senior Staff Engineer")
 
+def test_is_intern_role_business_early_career():
+    # India business early-career titles should count as intern-equivalent roles
+    assert is_intern_role("Management Trainee")
+    assert is_intern_role("Supply Chain Trainee")
+    assert is_intern_role("Graduate Programme - Operations")
+    assert is_intern_role("Operations Intern")
+    assert not is_intern_role("VP of Operations")
+
 def test_detect_remote():
     assert detect_remote("This is a Remote position") is True
     assert detect_remote("On-site in NYC") is False

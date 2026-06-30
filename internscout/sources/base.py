@@ -6,7 +6,9 @@ class Source(Protocol):
     name: str
     def search(self, queries: list[str], filters: Filters) -> list[Job]: ...
 
-_INTERN_RE = re.compile(r"\b(intern|internship|co-?op|new ?grad|early career|apprentice)\b", re.I)
+_INTERN_RE = re.compile(
+    r"\b(intern|internship|co-?op|new ?grad|graduate program(?:me)?|"
+    r"early career|apprentice|trainee)\b", re.I)
 
 def is_intern_role(title: str) -> bool:
     return bool(_INTERN_RE.search(title or ""))
