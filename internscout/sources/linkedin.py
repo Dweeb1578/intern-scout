@@ -1,6 +1,6 @@
 import logging
 from ..models import Job, Filters
-from .base import is_intern_role, detect_remote
+from .base import is_intern_role, detect_remote, location_param
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +15,9 @@ class LinkedInSource:
             title = (card.css("h3.base-search-card__title::text").get() or "").strip()
             if not is_intern_role(title):
                 continue
-            company = (card.css("h4.base-search-card__subtitle::text").get() or "").strip()
+            # company text lives inside a nested <a>; fall back to direct text
+            company = (card.css("h4.base-search-card__subtitle a::text").get()
+                       or card.css("h4.base-search-card__subtitle::text").get() or "").strip()
             loc = (card.css("span.job-search-card__location::text").get() or "").strip()
             url = card.css("a.base-card__full-link::attr(href)").get() or ""
             out.append(Job(title=title, company=company, location=loc,
@@ -26,10 +28,13 @@ class LinkedInSource:
     def search(self, queries: list[str], filters: Filters) -> list[Job]:
         from scrapling.fetchers import StealthyFetcher
         from urllib.parse import quote_plus
+        loc = location_param(filters)
         out = []
         for q in queries[:3]:
             url = ("https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/"
                    f"search?keywords={quote_plus(q)}")
+            if loc:
+                url += f"&location={quote_plus(loc)}"
             try:
                 page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
                 out.extend(self.parse_results(page.html_content))

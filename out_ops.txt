@@ -1,0 +1,8 @@
+TOTAL intern/trainee roles scraped: 9  |  surfaced after India/remote + keyword match: 6
+====================================================================================================
+ 1. [greenhouse] brex                   | Brex Internship Program                            | São Paulo, São Paulo, Br
+ 2. [greenhouse] inmobi                 | Intern - Industrial Trainee                        | Bangalore
+ 3. [greenhouse] groww                  | Intern - Growth (AI & MarTech)                     | Bengaluru-VTP, India
+ 4. [greenhouse] scaleai                | Technical Advisor Specialist (Part-Time Internship | San Francisco, CA
+ 5. [greenhouse] groww                  | Copy Writer - Intern                               | Bengaluru-VTP, India
+ 6. [greenhouse] groww                  | Internship - Content                               | Bengaluru-VTP, India

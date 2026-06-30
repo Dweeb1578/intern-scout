@@ -7,6 +7,7 @@ def test_parse_results_keeps_interns():
     jobs = LinkedInSource().parse_results(FIX.read_text())
     assert len(jobs) == 1
     assert jobs[0].title == "Data Science Intern"
+    # company lives inside a nested <a> in real LinkedIn cards
     assert jobs[0].company == "Acme AI"
-    assert jobs[0].remote is True
+    assert jobs[0].location == "Bengaluru, India"
     assert jobs[0].source == "linkedin"

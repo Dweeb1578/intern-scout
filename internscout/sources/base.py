@@ -21,6 +21,15 @@ def detect_remote(text: str):
         return False
     return None
 
+def location_param(filters) -> str:
+    """First concrete location to send to a search engine (skips remote/any),
+    so LinkedIn/Indeed return geo-relevant results instead of global ones."""
+    for l in getattr(filters, "locations", []) or []:
+        s = l.strip()
+        if s and s.lower() not in ("remote", "any"):
+            return s
+    return ""
+
 def dedupe(jobs: list[Job]) -> list[Job]:
     seen, out = set(), []
     for j in jobs:
