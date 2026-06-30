@@ -26,9 +26,10 @@ class IndeedSource:
 
     def search(self, queries: list[str], filters: Filters) -> list[Job]:
         from scrapling.fetchers import StealthyFetcher
+        from urllib.parse import quote_plus
         out = []
         for q in queries[:2]:
-            url = f"https://www.indeed.com/jobs?q={q.replace(' ', '+')}"
+            url = f"https://www.indeed.com/jobs?q={quote_plus(q)}"
             try:
                 page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
                 out.extend(self.parse_results(page.html_content))

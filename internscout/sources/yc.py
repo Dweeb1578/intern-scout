@@ -31,9 +31,10 @@ class YCSource:
 
     def search(self, queries: list[str], filters: Filters) -> list[Job]:
         from scrapling.fetchers import StealthyFetcher
+        from urllib.parse import quote_plus
         out = []
         for q in queries[:3]:
-            url = f"https://www.workatastartup.com/jobs?query={q.replace(' ', '+')}"
+            url = f"https://www.workatastartup.com/jobs?query={quote_plus(q)}"
             try:
                 page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
                 out.extend(self.parse_listing(page.html_content))

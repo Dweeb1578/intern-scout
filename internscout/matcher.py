@@ -32,7 +32,7 @@ def rank(jobs, query, fo, cfg, llm=None):
     if cfg.matcher_mode == "keyword":
         use_llm = False
     if use_llm and survivors:
-        ranked = _llm_rank(survivors, query, cfg, llm)
+        ranked = _llm_rank(survivors, query, fo, cfg, llm)
     else:
         ranked = _keyword_score(survivors, fo)
     ranked.sort(key=lambda r: r.score, reverse=True)
@@ -53,7 +53,7 @@ _RANK_SYSTEM = (
     "(one short sentence). Only include jobs worth surfacing."
 )
 
-def _llm_rank(jobs, query, cfg, llm):
+def _llm_rank(jobs, query, fo, cfg, llm):
     import json
     if llm is None:
         from .fanout import _make_groq_caller
@@ -76,4 +76,4 @@ def _llm_rank(jobs, query, cfg, llm):
             return out
     except Exception:
         pass
-    return _keyword_score(jobs, FanOut([], [], []))
+    return _keyword_score(jobs, fo)

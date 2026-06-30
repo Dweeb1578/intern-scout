@@ -31,12 +31,15 @@ def _rows(ranked: list[RankedJob]):
 def render_table(ranked: list[RankedJob]) -> None:
     from rich.console import Console
     from rich.table import Table
+    from rich.markup import escape
     t = Table(show_lines=False)
     for c in ["#", "Score", "Title", "Company", "Location", "Src", "Why", "URL"]:
         t.add_column(c, overflow="fold")
     for row in _rows(ranked):
-        t.add_row(str(row["rank"]), str(row["score"]), row["title"], row["company"],
-                  row["location"], row["source"], row["reason"], row["url"])
+        # scraped fields are untrusted: escape so Rich can't interpret [markup] or links
+        t.add_row(str(row["rank"]), str(row["score"]), escape(row["title"]),
+                  escape(row["company"]), escape(row["location"]), escape(row["source"]),
+                  escape(row["reason"]), escape(row["url"]))
     Console().print(t)
 
 def to_csv(ranked: list[RankedJob], path: str) -> None:

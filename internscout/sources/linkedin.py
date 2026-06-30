@@ -25,10 +25,11 @@ class LinkedInSource:
 
     def search(self, queries: list[str], filters: Filters) -> list[Job]:
         from scrapling.fetchers import StealthyFetcher
+        from urllib.parse import quote_plus
         out = []
         for q in queries[:3]:
             url = ("https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/"
-                   f"search?keywords={q.replace(' ', '%20')}")
+                   f"search?keywords={quote_plus(q)}")
             try:
                 page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
                 out.extend(self.parse_results(page.html_content))

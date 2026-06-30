@@ -34,3 +34,17 @@ def test_max_results_truncates(monkeypatch):
     fo = FanOut(search_queries=[], keywords=["python"], domain_tags=[])
     out = rank([mkjob("A"), mkjob("B")], q, fo, cfg)
     assert len(out) == 1
+
+def test_llm_failure_falls_back_to_real_keyword_scores(monkeypatch):
+    # When the LLM path is active but the call blows up, the fallback must use the
+    # REAL FanOut keywords (not an empty one), so scores reflect actual matches.
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    monkeypatch.setenv("INTERNSCOUT_MATCHER", "hybrid")
+    cfg = load_config()
+    q = UserQuery("backend intern", Filters(max_results=5))
+    fo = FanOut(search_queries=[], keywords=["python", "api", "backend"], domain_tags=[])
+    def boom_llm(system, user):
+        raise RuntimeError("llm down")
+    out = rank([mkjob("SWE Intern")], q, fo, cfg, llm=boom_llm)
+    assert out[0].score == 3.0                 # all 3 keywords present in the job
+    assert out[0].reason == "keyword match: 3 terms"
