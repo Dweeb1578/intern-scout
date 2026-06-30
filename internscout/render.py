@@ -3,6 +3,24 @@ from .models import RankedJob
 
 _COLS = ["rank", "score", "title", "company", "location", "source", "reason", "url"]
 
+# Scraped job fields are untrusted. Neutralize spreadsheet/markdown injection before
+# writing them to files a user opens in Excel/Sheets or renders as Markdown.
+_CSV_TRIGGERS = ("=", "+", "-", "@", "\t", "\r")
+
+def _csv_safe(value):
+    """Prefix a leading formula trigger with ' so spreadsheets treat it as text."""
+    if isinstance(value, str) and value and value[0] in _CSV_TRIGGERS:
+        return "'" + value
+    return value
+
+def _md_safe(value):
+    """Escape pipes and collapse newlines so a cell can't break the table."""
+    if not isinstance(value, str):
+        return value
+    return (value.replace("\\", "\\\\").replace("|", "\\|")
+            .replace("\r", " ").replace("\n", " ")
+            .replace("<", "&lt;").replace(">", "&gt;"))
+
 def _rows(ranked: list[RankedJob]):
     for i, r in enumerate(ranked, 1):
         j = r.job
@@ -26,14 +44,15 @@ def to_csv(ranked: list[RankedJob], path: str) -> None:
         w = csv.DictWriter(f, fieldnames=_COLS)
         w.writeheader()
         for row in _rows(ranked):
-            w.writerow(row)
+            w.writerow({k: _csv_safe(v) for k, v in row.items()})
 
 def to_markdown(ranked: list[RankedJob], path: str) -> None:
     lines = ["| # | Score | Title | Company | Location | Source | Why | URL |",
              "|---|---|---|---|---|---|---|---|"]
     for row in _rows(ranked):
+        safe = {k: _md_safe(v) for k, v in row.items()}
         lines.append("| {rank} | {score} | {title} | {company} | {location} | "
-                     "{source} | {reason} | {url} |".format(**row))
+                     "{source} | {reason} | {url} |".format(**safe))
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
