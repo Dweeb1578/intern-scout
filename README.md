@@ -29,11 +29,20 @@ internscout
 One-shot:
 ```bash
 internscout --prompt "backend internship at an early-stage AI startup" \
-  --remote any --locations "SF, NYC, Remote" --limit 25 --export csv
+  --remote any --locations "India, Remote" --limit 25 --export csv
 ```
 
 Flags: `--prompt`, `--remote remote|onsite|any`, `--locations "A, B"`, `--grad-year`,
 `--limit`, `--export csv|md`.
+
+## Location
+
+By default Intern Scout only returns roles that are **in India or remote** — leave
+`--locations` blank (or pass `"India"`) and it keeps Indian roles (recognizing major
+cities like Bengaluru, Gurgaon, Hyderabad, Pune… not just the literal word "India")
+plus any remote role. Remote roles always pass regardless of where the company is.
+
+To search elsewhere, pass explicit cities/countries, e.g. `--locations "London, Berlin"`.
 
 ## Notes
 

@@ -7,6 +7,10 @@ from .render import render_table, export
 
 def build_query(args) -> UserQuery:
     locs = [s.strip() for s in (args.locations or "").split(",") if s.strip()]
+    # Default geography for this tool: India-based or remote roles. Remote jobs
+    # always pass the location filter, so ["India"] means "in India or remote".
+    if not locs:
+        locs = ["India"]
     return UserQuery(
         prompt=args.prompt,
         filters=Filters(remote=args.remote, locations=locs,
@@ -17,7 +21,7 @@ def _interactive(args):
     args.prompt = input("What kind of internship are you looking for? ").strip()
     r = input("Remote / onsite / any? [any] ").strip().lower() or "any"
     args.remote = r if r in ("remote", "onsite", "any") else "any"
-    args.locations = input("Preferred locations (comma-separated, blank=any): ").strip()
+    args.locations = input("Preferred locations (comma-separated, blank = India or remote): ").strip()
     gy = input("Graduation year (blank to skip): ").strip()
     args.grad_year = int(gy) if gy.isdigit() else None
     lim = input("How many results? [25] ").strip()

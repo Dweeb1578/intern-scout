@@ -1,6 +1,14 @@
 from .models import Job, Filters, RankedJob
 from .fanout import FanOut
 from .config import Config, has_llm
+from .geo import is_india_location
+
+def _location_matches(loc: str, wanted: str) -> bool:
+    """A wanted location of 'india' matches Indian cities/regions, not just the
+    literal word; anything else is a plain case-insensitive substring match."""
+    if wanted == "india":
+        return is_india_location(loc)
+    return wanted in loc
 
 def passes_filters(job: Job, filters: Filters) -> bool:
     if filters.remote == "remote" and job.remote is not True:
@@ -9,7 +17,7 @@ def passes_filters(job: Job, filters: Filters) -> bool:
         return False
     if filters.locations and job.remote is not True:
         loc = job.location.lower()
-        if not any(l.lower() in loc for l in filters.locations):
+        if not any(_location_matches(loc, l.strip().lower()) for l in filters.locations):
             return False
     return True
 

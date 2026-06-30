@@ -27,3 +27,17 @@ def test_empty_keywords_keeps_all():
     fo = FanOut(search_queries=[], keywords=[], domain_tags=[])
     jobs = [mkjob(), mkjob(title="Sales")]
     assert len(keyword_prefilter(jobs, fo, Filters())) == 2
+
+def test_india_filter_matches_indian_cities():
+    f = Filters(locations=["India"])
+    # literal country, and Indian cities that don't contain the word "India"
+    assert passes_filters(mkjob(location="Bengaluru, KA"), f)
+    assert passes_filters(mkjob(location="Gurgaon"), f)
+    assert passes_filters(mkjob(location="Remote - India"), f)
+    # a non-Indian onsite role is rejected
+    assert not passes_filters(mkjob(location="San Francisco, CA"), f)
+
+def test_india_filter_still_keeps_remote_anywhere():
+    f = Filters(locations=["India"])
+    # remote roles always pass the location filter, even if onsite-location is elsewhere
+    assert passes_filters(mkjob(location="London, UK", remote=True), f)

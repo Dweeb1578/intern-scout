@@ -15,4 +15,9 @@ def test_build_query_splits_locations():
 def test_build_query_remote_flag():
     q = build_query(_ns(remote="remote", locations=""))
     assert q.filters.remote == "remote"
-    assert q.filters.locations == []
+    # no locations given -> default geography is India (remote roles also pass)
+    assert q.filters.locations == ["India"]
+
+def test_build_query_defaults_to_india_when_blank():
+    q = build_query(_ns(locations=""))
+    assert q.filters.locations == ["India"]
