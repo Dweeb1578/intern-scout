@@ -35,8 +35,7 @@ class GreenhouseSource:
 
     def _fetch_json(self, url: str) -> dict:
         from scrapling.fetchers import Fetcher
-        page = Fetcher.fetch(url)
-        return json.loads(page.body)
+        return Fetcher.get(url).json()
 
     def search(self, queries: list[str], filters: Filters) -> list[Job]:
         out = []

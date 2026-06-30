@@ -31,7 +31,7 @@ class LinkedInSource:
                    f"search?keywords={q.replace(' ', '%20')}")
             try:
                 page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
-                out.extend(self.parse_results(page.body))
+                out.extend(self.parse_results(page.html_content))
             except Exception as e:
                 log.warning("linkedin query %r failed (best-effort): %s", q, e)
         return out

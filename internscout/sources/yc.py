@@ -36,7 +36,7 @@ class YCSource:
             url = f"https://www.workatastartup.com/jobs?query={q.replace(' ', '+')}"
             try:
                 page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
-                out.extend(self.parse_listing(page.body))
+                out.extend(self.parse_listing(page.html_content))
             except Exception as e:
                 log.warning("yc query %r failed: %s", q, e)
         return out

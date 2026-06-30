@@ -36,7 +36,7 @@ class AshbySource:
 
     def _fetch_json(self, url: str) -> dict:
         from scrapling.fetchers import Fetcher
-        return json.loads(Fetcher.fetch(url).body)
+        return Fetcher.get(url).json()
 
     def search(self, queries, filters) -> list[Job]:
         out = []

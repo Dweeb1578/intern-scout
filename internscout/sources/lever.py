@@ -36,7 +36,7 @@ class LeverSource:
 
     def _fetch_json(self, url: str):
         from scrapling.fetchers import Fetcher
-        return json.loads(Fetcher.fetch(url).body)
+        return Fetcher.get(url).json()
 
     def search(self, queries, filters) -> list[Job]:
         out = []
