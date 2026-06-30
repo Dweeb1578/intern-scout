@@ -1,0 +1,14 @@
+[
+  {"name": "Ramp", "ats": "greenhouse", "slug": "ramp"},
+  {"name": "Notion", "ats": "greenhouse", "slug": "notion"},
+  {"name": "Airtable", "ats": "greenhouse", "slug": "airtable"},
+  {"name": "Brex", "ats": "greenhouse", "slug": "brex"},
+  {"name": "Vercel", "ats": "greenhouse", "slug": "vercel"},
+  {"name": "Scale AI", "ats": "greenhouse", "slug": "scaleai"},
+  {"name": "Anduril", "ats": "greenhouse", "slug": "andurilindustries"},
+  {"name": "Linear", "ats": "ashby", "slug": "linear"},
+  {"name": "Cursor", "ats": "ashby", "slug": "anysphere"},
+  {"name": "Ashby", "ats": "ashby", "slug": "ashby"},
+  {"name": "Mux", "ats": "lever", "slug": "mux"},
+  {"name": "Netlify", "ats": "lever", "slug": "netlify"}
+]

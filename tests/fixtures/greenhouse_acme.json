@@ -1,0 +1,8 @@
+{"jobs": [
+  {"title": "Software Engineering Intern", "location": {"name": "San Francisco, CA"},
+   "absolute_url": "https://boards.greenhouse.io/acme/jobs/1",
+   "content": "Work on our backend APIs in Python. Remote friendly.", "updated_at": "2026-06-01"},
+  {"title": "Senior Staff Engineer", "location": {"name": "New York, NY"},
+   "absolute_url": "https://boards.greenhouse.io/acme/jobs/2",
+   "content": "Lead architecture.", "updated_at": "2026-06-02"}
+]}
