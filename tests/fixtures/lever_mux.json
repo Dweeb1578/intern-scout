@@ -1,0 +1,8 @@
+[
+  {"text": "Backend Engineering Intern",
+   "categories": {"location": "Remote - US", "commitment": "Intern", "team": "Eng"},
+   "hostedUrl": "https://jobs.lever.co/mux/abc", "descriptionPlain": "Build APIs in Go.",
+   "createdAt": 1717200000000},
+  {"text": "VP of Sales", "categories": {"location": "SF", "commitment": "Full-time", "team": "Sales"},
+   "hostedUrl": "https://jobs.lever.co/mux/xyz", "descriptionPlain": "Lead sales.", "createdAt": 1717200000000}
+]
