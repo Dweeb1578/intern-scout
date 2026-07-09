@@ -5,6 +5,11 @@ English, add a couple of filters, and Intern Scout scrapes startup ATS boards, Y
 (best-effort) LinkedIn/Indeed, then ranks the most relevant openings - and the companies
 behind them.
 
+> **Using an AI coding agent (Codex, Cursor, GLM, Claude Code)?** It will read
+> [`AGENTS.md`](AGENTS.md) automatically — that file tells your agent how to set this up
+> and run internship searches *for* you. Just point it at this repo and say "help me find
+> an internship."
+
 ## Setup
 
 1. Install Python 3.11+.
