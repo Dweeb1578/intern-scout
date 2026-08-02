@@ -1,15 +1,18 @@
 import logging
 from ..models import Job, Filters
-from .base import is_intern_role, detect_remote, location_param
+from .base import is_intern_role, detect_remote, location_param, BROWSER_TIMEOUT_MS
 
 log = logging.getLogger(__name__)
 
 class IndeedSource:
     name = "indeed"
 
-    def parse_results(self, html: str) -> list[Job]:
+    def parse_results(self, html: str, domain: str = "www.indeed.com") -> list[Job]:
         from scrapling.parser import Selector
-        page = Selector(html, url="https://www.indeed.com")
+        # Job links must stay on the domain the search ran against: an Indian
+        # result rehomed onto www.indeed.com bounces through a country redirect.
+        base = f"https://{domain}"
+        page = Selector(html, url=base)
         out = []
         for card in page.css("div.job_seen_beacon"):
             # Indeed's card markup rotates; try current selectors then older ones
@@ -23,11 +26,11 @@ class IndeedSource:
                    or card.css("div.companyLocation::text").get() or "").strip()
             jk = card.css("a[data-jk]::attr(data-jk)").get()
             if jk:
-                url = f"https://www.indeed.com/viewjob?jk={jk}"
+                url = f"{base}/viewjob?jk={jk}"
             else:
                 href = (card.css("h3.jobTitle a::attr(href)").get()
                         or card.css("a.jcs-JobTitle::attr(href)").get() or "")
-                url = ("https://www.indeed.com" + href) if href.startswith("/") else href
+                url = (base + href) if href.startswith("/") else href
             out.append(Job(title=title, company=company, location=loc,
                            remote=detect_remote(loc), url=url,
                            description=title, source=self.name))
@@ -47,8 +50,9 @@ class IndeedSource:
             if loc:
                 url += f"&l={quote_plus(loc)}"
             try:
-                page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
-                out.extend(self.parse_results(page.html_content))
+                page = StealthyFetcher.fetch(url, headless=True, network_idle=True,
+                                             timeout=BROWSER_TIMEOUT_MS)
+                out.extend(self.parse_results(page.html_content, domain))
             except Exception as e:
                 log.warning("indeed query %r failed (best-effort): %s", q, e)
         return out

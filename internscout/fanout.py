@@ -48,6 +48,27 @@ class FanOut:
     keywords: list[str]
     domain_tags: list[str]
 
+def _clean_str_list(value) -> list[str]:
+    """Coerce a field of model-generated JSON into a de-duped list of strings.
+
+    The model is asked for lists of strings but is not bound to deliver them: a
+    bare string, a nested list, or numbers ("2026") all show up in practice.
+    Downstream code calls .lower() on these, so anything non-string that slips
+    through crashes the whole run rather than degrading it.
+    """
+    if value is None:
+        return []
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, (list, tuple, set)):
+        return []
+    out = []
+    for v in value:
+        s = v.strip() if isinstance(v, str) else (str(v).strip() if isinstance(v, (int, float)) else "")
+        if s and s not in out:
+            out.append(s)
+    return out
+
 def _fallback_fanout(prompt: str) -> FanOut:
     tokens = [t for t in re.findall(r"[a-zA-Z+#]+", prompt.lower()) if t not in _STOP and len(t) > 1]
     keywords = list(dict.fromkeys(tokens))
@@ -76,11 +97,14 @@ def fan_out(prompt: str, cfg: Config, llm=None) -> FanOut:
     try:
         raw = llm(_SYSTEM, prompt)
         data = json.loads(raw[raw.index("{"):raw.rindex("}") + 1])
-        if data.get("search_queries"):
+        if not isinstance(data, dict):
+            return _fallback_fanout(prompt)
+        queries = _clean_str_list(data.get("search_queries"))
+        if queries:
             return FanOut(
-                search_queries=data.get("search_queries") or [],
-                keywords=data.get("keywords") or [],
-                domain_tags=data.get("domain_tags") or [],
+                search_queries=queries,
+                keywords=_clean_str_list(data.get("keywords")),
+                domain_tags=_clean_str_list(data.get("domain_tags")),
             )
         return _fallback_fanout(prompt)
     except Exception:

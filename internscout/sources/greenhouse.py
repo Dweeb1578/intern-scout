@@ -1,7 +1,7 @@
 import json
 import logging
 from ..models import Job, Filters
-from .base import is_intern_role, detect_remote
+from .base import is_intern_role, detect_remote, HTTP_TIMEOUT_S
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class GreenhouseSource:
 
     def _fetch_json(self, url: str) -> dict:
         from scrapling.fetchers import Fetcher
-        return Fetcher.get(url).json()
+        return Fetcher.get(url, timeout=HTTP_TIMEOUT_S).json()
 
     def search(self, queries: list[str], filters: Filters) -> list[Job]:
         out = []

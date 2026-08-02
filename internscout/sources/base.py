@@ -6,6 +6,14 @@ class Source(Protocol):
     name: str
     def search(self, queries: list[str], filters: Filters) -> list[Job]: ...
 
+# Network budgets, per request. Mind the units: Scrapling's plain `Fetcher` takes
+# SECONDS (default 30), while `StealthyFetcher` wraps Playwright and takes
+# MILLISECONDS (default 30000). Passing the same number to both silently gives the
+# browser a 30ms budget. Both sit under the pipeline's per-source timeout so a
+# single slow board can't eat the whole source's budget.
+HTTP_TIMEOUT_S = 15
+BROWSER_TIMEOUT_MS = 25_000
+
 _INTERN_RE = re.compile(
     r"\b(intern|internship|co-?op|new ?grad|graduate program(?:me)?|"
     r"early career|apprentice|trainee)\b", re.I)
@@ -20,6 +28,16 @@ def detect_remote(text: str):
     if "on-site" in t or "onsite" in t or "in office" in t or "in-office" in t:
         return False
     return None
+
+def slugify(name: str) -> str:
+    """Turn a display company name into the shape an ATS board slug takes.
+
+    Greenhouse/Lever/Ashby board slugs are lowercase and alphanumeric
+    ("Razorpay Software Private Limited" -> "razorpaysoftwareprivatelimited"),
+    so a raw display name scraped off YC will never resolve. This is still only
+    a guess - misses are logged and skipped by the caller.
+    """
+    return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
 
 def location_param(filters) -> str:
     """First concrete location to send to a search engine (skips remote/any),

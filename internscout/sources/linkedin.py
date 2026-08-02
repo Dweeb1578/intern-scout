@@ -1,6 +1,6 @@
 import logging
 from ..models import Job, Filters
-from .base import is_intern_role, detect_remote, location_param
+from .base import is_intern_role, detect_remote, location_param, BROWSER_TIMEOUT_MS
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,8 @@ class LinkedInSource:
             if loc:
                 url += f"&location={quote_plus(loc)}"
             try:
-                page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
+                page = StealthyFetcher.fetch(url, headless=True, network_idle=True,
+                                             timeout=BROWSER_TIMEOUT_MS)
                 out.extend(self.parse_results(page.html_content))
             except Exception as e:
                 log.warning("linkedin query %r failed (best-effort): %s", q, e)

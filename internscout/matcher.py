@@ -1,7 +1,7 @@
 from .models import Job, Filters, RankedJob
 from .fanout import FanOut
 from .config import Config, has_llm
-from .geo import is_india_location
+from .geo import is_india_location, location_scope, remote_scopes
 
 def _location_matches(loc: str, wanted: str) -> bool:
     """A wanted location of 'india' matches Indian cities/regions, not just the
@@ -10,19 +10,43 @@ def _location_matches(loc: str, wanted: str) -> bool:
         return is_india_location(loc)
     return wanted in loc
 
+def remote_role_is_reachable(job: Job, filters: Filters) -> bool:
+    """Whether a remote role is one the seeker could actually hold.
+
+    Remote roles skip the location filter, because "remote" usually means the
+    company doesn't care where you sit. But plenty of postings say "fully remote
+    (within the U.S.)", and those aren't open to someone searching India. Drop a
+    remote role only when the posting names a region *and* none of the wanted
+    locations fall in it; anything ambiguous stays visible.
+    """
+    scopes = remote_scopes(f"{job.location} {job.description}")
+    if not scopes:
+        return True                      # unrestricted, or phrasing we can't read
+    wanted = {location_scope(l) for l in filters.locations}
+    wanted.discard(None)
+    if not wanted:
+        return True                      # can't place the seeker, so don't judge
+    return bool(scopes & wanted)
+
 def passes_filters(job: Job, filters: Filters) -> bool:
     if filters.remote == "remote" and job.remote is not True:
         return False
     if filters.remote == "onsite" and job.remote is True:
         return False
-    if filters.locations and job.remote is not True:
+    if filters.locations:
+        if job.remote is True:
+            return remote_role_is_reachable(job, filters)
         loc = job.location.lower()
         if not any(_location_matches(loc, l.strip().lower()) for l in filters.locations):
             return False
     return True
 
+def _keywords(fo: FanOut) -> list[str]:
+    """Lowercased keywords, ignoring anything the model returned that isn't text."""
+    return [k.lower() for k in fo.keywords if isinstance(k, str) and k]
+
 def keyword_prefilter(jobs: list[Job], fo: FanOut, filters: Filters) -> list[Job]:
-    kws = [k.lower() for k in fo.keywords]
+    kws = _keywords(fo)
     out = []
     for j in jobs:
         if not passes_filters(j, filters):
@@ -47,7 +71,7 @@ def rank(jobs, query, fo, cfg, llm=None):
     return ranked[: query.filters.max_results]
 
 def _keyword_score(jobs, fo):
-    kws = [k.lower() for k in fo.keywords]
+    kws = _keywords(fo)
     out = []
     for j in jobs:
         hay = f"{j.title} {j.description}".lower()
@@ -74,12 +98,25 @@ def _llm_rank(jobs, query, fo, cfg, llm):
     try:
         raw = llm(_RANK_SYSTEM, user)
         data = json.loads(raw[raw.index("["):raw.rindex("]") + 1])
-        out = []
+        out, seen = [], set()
         for d in data:
+            if not isinstance(d, dict):
+                continue
             i = d.get("i")
-            if isinstance(i, int) and 0 <= i < len(jobs):
-                out.append(RankedJob(job=jobs[i], score=float(d.get("score", 0)),
-                                     reason=str(d.get("reason", ""))))
+            # bool is an int subclass; True would silently index job 1
+            if not isinstance(i, int) or isinstance(i, bool):
+                continue
+            # the model repeats indices often enough that unguarded this shows
+            # the same job twice in the results table
+            if not (0 <= i < len(jobs)) or i in seen:
+                continue
+            seen.add(i)
+            try:
+                score = float(d.get("score", 0))
+            except (TypeError, ValueError):
+                score = 0.0
+            out.append(RankedJob(job=jobs[i], score=score,
+                                 reason=str(d.get("reason", ""))))
         if out:
             return out
     except Exception:
