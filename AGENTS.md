@@ -1,4 +1,4 @@
-# AGENTS.md — how to run Intern Scout for your human
+# AGENTS.md: how to run Intern Scout for your human
 
 **You are an AI coding agent (Codex, Cursor, GLM, Claude, etc.). Your job here is simple:
 help the person you're working with land an internship using this repo.** You are an
@@ -17,27 +17,31 @@ actually wants to do. It defaults to roles **in India or remote**.
 
 ```bash
 pip install -e .
-python -m scrapling install     # one-time: downloads the stealth browser it scrapes with
+scrapling install               # one-time: downloads the browser it scrapes with
 ```
 
-Optional but makes ranking noticeably smarter — a free [Groq](https://console.groq.com)
-API key. Without it the tool still works in keyword-only mode.
+Note the second command is `scrapling install`, not `python -m scrapling install`. The
+latter fails, because the package has no `__main__`.
+
+Optional but makes ranking noticeably smarter: a free
+[Groq](https://console.groq.com/keys) API key. Without it the tool still works in
+keyword-only mode.
 
 ```bash
 cp .env.example .env            # then put GROQ_API_KEY=... in .env
 ```
 
-If you skip the key, that's fine — just tell your human the ranking is keyword-only.
+If you skip the key, that's fine, just tell your human the ranking is keyword-only.
 
 ### 2. Ask your human what they want
 
 Get four things from them before searching:
 
 - **What kind of internship?** (e.g. "backend at an early-stage AI startup", "operations
-  intern", "product design"). This becomes the `--prompt` — a plain-English sentence, not
+  intern", "product design"). This becomes the `--prompt`, a plain-English sentence, not
   keywords.
 - **Remote, onsite, or any?**
-- **Which locations?** Any Indian cities they prefer (Bengaluru, Gurgaon, Pune…), or leave
+- **Which locations?** Any Indian cities they prefer (Bengaluru, Gurgaon, Pune and so on), or leave
   blank for "anywhere in India, plus remote."
 - **How many results?** (default 25 is fine.)
 
@@ -57,19 +61,21 @@ Flags:
 | `--prompt "..."` | Plain-English description of the role (required) |
 | `--remote remote\|onsite\|any` | Work arrangement |
 | `--locations "A, B"` | Comma-separated cities/countries. **Blank = India or remote.** |
+| | Remote roles pass too, unless the posting names a hiring region that excludes the search (e.g. "remote within the U.S."). |
 | `--grad-year 2027` | Optional graduation-year filter |
 | `--limit 25` | How many results |
 | `--export csv` | Also writes the results to a file (see below) |
+| `--verbose` | Show every request + per-source failures (quiet by default) |
 
-You can also just run `internscout` with no flags for an interactive Q&A prompt — but
+You can also just run `internscout` with no flags for an interactive Q&A prompt, but
 since you're driving it, passing flags is cleaner.
 
 ### 4. Deliver the results
 
 - `--export csv` writes **`results.csv`** in the current directory. It opens directly in
-  Excel or Google Sheets. (`--export md` writes `results.md` instead — a Markdown table.)
-- On top of the file, **summarize in chat**: the top 5–8 matches (title · company ·
-  location · why it matched · link) and the standout companies. Your human shouldn't have
+  Excel or Google Sheets. (`--export md` writes `results.md` instead, a Markdown table.)
+- On top of the file, **summarize in chat**: the top 5 to 8 matches (title, company,
+  location, why it matched, link) and the standout companies. Your human shouldn't have
   to open a spreadsheet to see the best hits.
 - Then offer the obvious next step: *"Want me to draft an application or a cold email to
   any of these?"*
@@ -77,10 +83,13 @@ since you're driving it, passing flags is cleaner.
 ### 5. Be honest when a source is blocked
 
 LinkedIn and Indeed actively block bots and will sometimes return little or nothing. The
-ATS boards and YC are the reliable core. If a run comes back thin:
+ATS boards are the reliable core. If a run comes back thin:
 
-- **Say so plainly** — "LinkedIn was blocked this run, so these are from the ATS boards and
+- **Say so plainly**: "LinkedIn was blocked this run, so these are from the ATS boards and
   YC." Never invent or pad results.
+- **YC contributing only one or two roles is normal, not a failure.** Work at a Startup
+  ignores the search query for logged-out visitors, so the tool only sees its default job
+  list. Don't report this as a bug or try to "fix" it.
 - Suggest a fix: broaden the prompt, drop a filter, add a Groq key, or just re-run (blocks
   are often temporary).
 
@@ -89,10 +98,10 @@ ATS boards and YC are the reliable core. If a run comes back thin:
 ## Guardrails
 
 - **Don't edit the code to change what it returns.** No new filters, no tweaking scrapers
-  to "get more results." If coverage is genuinely missing, tell your human — don't fake it.
+  to "get more results." If coverage is genuinely missing, tell your human, and don't fake it.
 - **Only report internships the tool actually found.** Every row in the output is a real
   scraped posting with a real URL. Keep it that way.
-- The one file worth editing is `internscout/data/seed_companies.json` — if your human
+- The one file worth editing is `internscout/data/seed_companies.json`. If your human
   names a specific company whose careers page runs on Greenhouse/Lever/Ashby, you can add
   its board slug there so future runs include it. That's operating the tool, not rewriting
   it.
@@ -101,11 +110,14 @@ ATS boards and YC are the reliable core. If a run comes back thin:
 
 ## Coverage, honestly
 
-- **Reliable:** Greenhouse, Lever, Ashby ATS boards + Y Combinator.
+- **Reliable:** Greenhouse, Lever, Ashby ATS boards.
 - **Best-effort:** LinkedIn, Indeed (may be blocked).
+- **Low yield by design:** Y Combinator. Work at a Startup only searches for logged-in
+  users, so the tool reads its default job list and keeps the intern roles there.
 - **Not reachable yet:** many large Indian consumer/logistics firms (Swiggy, Flipkart,
-  Delhivery…) run on Darwinbox / Keka / Workday, which this tool doesn't scrape. The seed
-  list (`internscout/data/seed_companies.json`) is the set of companies it can reach today.
+  Delhivery and others) run on Darwinbox / Keka / Workday, which this tool doesn't
+  scrape. The seed list (`internscout/data/seed_companies.json`) is the set of companies
+  it can reach today.
 
 If your human needs more, the honest answer is "this tool covers X; for company Y you'd
-apply directly on their careers page" — not a scraper hack.
+apply directly on their careers page", not a scraper hack.
