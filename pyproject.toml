@@ -4,7 +4,15 @@ version = "0.1.0"
 description = "Find internships that match what you want to do."
 requires-python = ">=3.11"
 dependencies = [
-    "scrapling>=0.2",
+    # The [fetchers] extra is required, not optional: plain `scrapling` installs
+    # the parser only, and every source here fails with "No module named
+    # 'curl_cffi'". The 0.4 floor is where scrapling.parser.Selector and the
+    # per-request timeout arguments this code passes came in.
+    "scrapling[fetchers]>=0.4.9,<0.5",
+    # Pinned transitive dep: apify-fingerprint-datapoints 0.14.0 breaks the header
+    # generation browserforge runs at import time, so importing StealthyFetcher
+    # raises and the YC/LinkedIn/Indeed sources all silently return nothing.
+    "apify-fingerprint-datapoints<0.14",
     "groq>=0.11",
     "python-dotenv>=1.0",
     "rich>=13.0",
